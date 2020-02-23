@@ -23,4 +23,11 @@ Afterwards enter the following command to build and install dmenu:
 **Running dmenu**
 -------------
 Using the -c flag produce that dmenu start centered.
+
+If you use dwm, can add this lines of code to your config.h:
+```
+static const char *dmenucmd[]                   = { "dmenu_run", "-l", "20", "-c", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1,
+                                                "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
+```
+
 See the man page for more details.
