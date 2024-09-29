@@ -1,26 +1,17 @@
 diff --git a/dmenu.c b/dmenu.c
-index 7361377..76acee6 100644
+index 027dddb..0b92f1f 100644
 --- a/dmenu.c
 +++ b/dmenu.c
-@@ -7,6 +7,7 @@
- #include <strings.h>
- #include <time.h>
- #include <unistd.h>
-+#include <stdbool.h>
- 
- #include <X11/Xlib.h>
- #include <X11/Xatom.h>
-@@ -317,6 +318,9 @@ keypress(XKeyEvent *ev)
+@@ -334,6 +334,8 @@ keypress(XKeyEvent *ev)
  	int len;
- 	KeySym ksym;
+ 	KeySym ksym = NoSymbol;
  	Status status;
-+	int i;
++	int i, offscreen = 0;
 +	struct item *tmpsel;
-+	bool offscreen = false;
  
  	len = XmbLookupString(xic, ev, buf, sizeof buf, &ksym, &status);
  	switch (status) {
-@@ -443,6 +447,24 @@ insert:
+@@ -465,6 +467,27 @@ insert:
  		calcoffsets();
  		break;
  	case XK_Left:
@@ -29,10 +20,13 @@ index 7361377..76acee6 100644
 +				return;
 +			tmpsel = sel;
 +			for (i = 0; i < lines; i++) {
-+				if (!tmpsel->left ||  tmpsel->left->right != tmpsel)
++				if (!tmpsel->left || tmpsel->left->right != tmpsel) {
++					if (offscreen)
++						break;
 +					return;
++				}
 +				if (tmpsel == curr)
-+					offscreen = true;
++					offscreen = 1;
 +				tmpsel = tmpsel->left;
 +			}
 +			sel = tmpsel;
@@ -42,10 +36,10 @@ index 7361377..76acee6 100644
 +			}
 +			break;
 +		}
+ 	case XK_KP_Left:
  		if (cursor > 0 && (!sel || !sel->left || lines > 0)) {
  			cursor = nextrune(-1);
- 			break;
-@@ -479,6 +501,24 @@ insert:
+@@ -505,6 +528,27 @@ insert:
  			sel->out = 1;
  		break;
  	case XK_Right:
@@ -54,11 +48,14 @@ index 7361377..76acee6 100644
 +				return;
 +			tmpsel = sel;
 +			for (i = 0; i < lines; i++) {
-+				if (!tmpsel->right ||  tmpsel->right->left != tmpsel)
++				if (!tmpsel->right ||  tmpsel->right->left != tmpsel) {
++					if (offscreen)
++						break;
 +					return;
++				}
 +				tmpsel = tmpsel->right;
 +				if (tmpsel == next)
-+					offscreen = true;
++					offscreen = 1;
 +			}
 +			sel = tmpsel;
 +			if (offscreen) {
@@ -67,6 +64,6 @@ index 7361377..76acee6 100644
 +			}
 +			break;
 +		}
+ 	case XK_KP_Right:
  		if (text[cursor] != '\0') {
  			cursor = nextrune(+1);
- 			break;
