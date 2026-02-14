@@ -194,7 +194,7 @@ drawitem(struct item *item, int x, int y, int w)
 }
 
 static void
-recalculatenumbers()
+recalculatenumbers(void)
 {
 	unsigned int numer = 0, denom = 0;
 	struct item *item;
